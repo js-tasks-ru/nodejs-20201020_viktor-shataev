@@ -30,47 +30,26 @@ server.on( 'request', ( req, res ) => {
 						res.end( 'File already exists' );
 					} else {
 						const limitStream = new LimitSizeStream( { limit: 1000000 } );
-						const writeStream = fs.createWriteStream( filepath, { flags: 'wx' } );
+						const writeStream = fs.createWriteStream( filepath );
+
+						req.on('aborted', () => {
+							writeStream.end();
+							fs.unlinkSync(filepath);
+						});
 
 						//Если размер файла превышает допустимый, тормозим стрим на запись и удаляем файл
 						limitStream.on( 'error', ( error ) => {
-							/*console.log('limitStream error');*/
-
+							writeStream.end();
+							fs.unlinkSync( filepath );
 							res.statusCode = 413;
 							res.end( 'File size is too large' );
-
-							writeStream.on('unpipe', ()=>{
-								/*console.log('unpiped');*/
-								writeStream.close();
-							});
-
-							writeStream.on('close', ()=>{
-								/*console.log('closed');*/
-
-								//Удаляем файл
-								fs.unlink( filepath, ( error ) => {
-									if ( error ) {
-										/*console.log( error );*/
-										res.statusCode = 500;
-										res.end();
-									}
-
-									/*console.log( filepath + ' was deleted' );*/
-								} );
-
-							});
-
-							limitStream.unpipe(writeStream);
 						} );
 
 						//Если файла еще не существует и его размер является допустимым,
 						//можно создавать новый
 						writeStream.on( 'finish', function () {
-							/*console.log( 'finish' );*/
-
 							res.statusCode = 201;
 							res.end( 'Successfully created' );
-
 						} );
 
 						writeStream.on( 'error', ( error ) => {
