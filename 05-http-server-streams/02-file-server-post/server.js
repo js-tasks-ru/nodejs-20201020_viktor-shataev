@@ -34,26 +34,28 @@ server.on( 'request', ( req, res ) => {
 
 						//Если размер файла превышает допустимый, тормозим стрим на запись и удаляем файл
 						limitStream.on( 'error', ( error ) => {
-							console.log('limitStream error');
+							/*console.log('limitStream error');*/
 
 							res.statusCode = 413;
 							res.end( 'File size is too large' );
 
 							writeStream.on('unpipe', ()=>{
-								console.log('unpiped');
+								/*console.log('unpiped');*/
 								writeStream.close();
 							});
 
 							writeStream.on('close', ()=>{
-								console.log('closed');
+								/*console.log('closed');*/
 
 								//Удаляем файл
 								fs.unlink( filepath, ( error ) => {
 									if ( error ) {
-										console.log( error );
+										/*console.log( error );*/
+										res.statusCode = 500;
+										res.end();
 									}
 
-									console.log( filepath + ' was deleted' );
+									/*console.log( filepath + ' was deleted' );*/
 								} );
 
 							});
@@ -64,7 +66,7 @@ server.on( 'request', ( req, res ) => {
 						//Если файла еще не существует и его размер является допустимым,
 						//можно создавать новый
 						writeStream.on( 'finish', function () {
-							console.log( 'finish' );
+							/*console.log( 'finish' );*/
 
 							res.statusCode = 201;
 							res.end( 'Successfully created' );
