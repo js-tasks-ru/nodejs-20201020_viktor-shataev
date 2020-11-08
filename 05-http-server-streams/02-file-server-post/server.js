@@ -32,17 +32,20 @@ server.on( 'request', ( req, res ) => {
 						const limitStream = new LimitSizeStream( { limit: 1000000 } );
 						const writeStream = fs.createWriteStream( filepath );
 
-						req.on('aborted', () => {
+						req.on( 'aborted', () => {
 							writeStream.end();
-							fs.unlinkSync(filepath);
-						});
+
+							fs.unlinkSync( filepath );
+						} );
 
 						//Если размер файла превышает допустимый, тормозим стрим на запись и удаляем файл
 						limitStream.on( 'error', ( error ) => {
-							writeStream.end();
-							fs.unlinkSync( filepath );
 							res.statusCode = 413;
 							res.end( 'File size is too large' );
+
+							writeStream.destroy();
+
+							fs.unlink( filepath, ( err ) => {} );
 						} );
 
 						//Если файла еще не существует и его размер является допустимым,
