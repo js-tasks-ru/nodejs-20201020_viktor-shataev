@@ -22,6 +22,10 @@ router.get( '/subscribe', async ( ctx, next ) => {
 router.post( '/publish', async ( ctx, next ) => {
 	const message = ctx.request.body.message;
 
+	if ( !message ) {
+		return next();
+	}
+
 	subscribers.map( resolve => {
 		resolve( message );
 	} );
