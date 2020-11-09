@@ -21,56 +21,54 @@ server.on( 'request', ( req, res ) => {
 
 		switch ( req.method ) {
 			case 'POST':
-				//Проверка на существование файла
-				fs.access( filepath, fs.constants.F_OK, ( error ) => {
+				const limitStream = new LimitSizeStream( { limit: 1000000 } );
+				const writeStream = fs.createWriteStream( filepath, { flags: 'wx' } );
 
-					//fs.access передает в колбэк ошибку в том случае, если файл не существует
-					if ( !error ) {
+				req.on( 'aborted', () => {
+					writeStream.end();
+
+					fs.unlinkSync( filepath );
+				} );
+
+				//Если размер файла превышает допустимый, тормозим стрим на запись и удаляем файл
+				limitStream.on( 'error', ( error ) => {
+					res.statusCode = 413;
+					res.end( 'File size is too large' );
+
+					writeStream.destroy();
+
+					fs.unlink( filepath, ( err ) => {
+					} );
+				} );
+
+				//Если файла еще не существует и его размер является допустимым,
+				//можно создавать новый
+				writeStream.on( 'finish', function () {
+					res.statusCode = 201;
+					res.end( 'Successfully created' );
+				} );
+
+				writeStream.on( 'error', ( error ) => {
+					//Проверка на существование файла
+					if ( error.code === 'EEXIST' ) {
 						res.statusCode = 409;
 						res.end( 'File already exists' );
 					} else {
-						const limitStream = new LimitSizeStream( { limit: 1000000 } );
-						const writeStream = fs.createWriteStream( filepath );
-
-						req.on( 'aborted', () => {
-							writeStream.end();
-
-							fs.unlinkSync( filepath );
-						} );
-
-						//Если размер файла превышает допустимый, тормозим стрим на запись и удаляем файл
-						limitStream.on( 'error', ( error ) => {
-							res.statusCode = 413;
-							res.end( 'File size is too large' );
-
-							writeStream.destroy();
-
-							fs.unlink( filepath, ( err ) => {} );
-						} );
-
-						//Если файла еще не существует и его размер является допустимым,
-						//можно создавать новый
-						writeStream.on( 'finish', function () {
-							res.statusCode = 201;
-							res.end( 'Successfully created' );
-						} );
-
-						writeStream.on( 'error', ( error ) => {
-							res.statusCode = 500;
-							res.end( 'Internal Server Error' );
-						} );
-
-						req.pipe( limitStream ).pipe( writeStream );
+						res.statusCode = 500;
+						res.end( 'Internal Server Error' );
 					}
 				} );
 
-				break;
+				req.pipe( limitStream ).pipe( writeStream );
 
-			default:
-				res.statusCode = 501;
-				res.end( 'Not implemented' );
-		}
+		break;
+
+	default:
+		res.statusCode = 501;
+		res.end( 'Not implemented' );
 	}
-} );
+}
+} )
+;
 
 module.exports = server;
