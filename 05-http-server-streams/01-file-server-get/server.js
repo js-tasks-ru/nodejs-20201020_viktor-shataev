@@ -17,17 +17,19 @@ server.on( 'request', ( req, res ) => {
 	} else {
 		switch ( req.method ) {
 			case 'GET':
-				fs.readFile( filepath, function ( error, data ) {
-					if ( error ) {
+				const readableStream = fs.createReadStream( filepath);
+
+				readableStream
+					.on('error', (error)=>{
 						if ( error.code === 'ENOENT' ) {
 							res.statusCode = 404;
 							res.end( 'Not found' );
+						} else {
+							res.statusCode = 500;
+							res.end( );
 						}
-					} else {
-						res.end( data );
-					}
-				} );
-
+					})
+					.pipe(res);
 
 				break;
 
@@ -37,5 +39,8 @@ server.on( 'request', ( req, res ) => {
 		}
 	}
 } );
+
+
+
 
 module.exports = server;
