@@ -19,7 +19,6 @@ module.exports.productsBySubcategory = async function productsBySubcategory ( ct
 };
 
 module.exports.productList = async function productList ( ctx, next ) {
-	console.log( ctx.state.products );
 	ctx.body = { products: ctx.state.products };
 };
 
