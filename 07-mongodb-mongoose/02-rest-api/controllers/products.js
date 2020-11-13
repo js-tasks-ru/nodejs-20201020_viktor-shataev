@@ -29,7 +29,7 @@ module.exports.validateObjectId = function ( ctx, next ) {
 		ctx.throw( 400, 'Invalid id' );
 	}
 
-	next();
+	return next();
 };
 
 module.exports.productById = async function productById ( ctx, next ) {
