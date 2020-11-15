@@ -4,18 +4,22 @@ const UserModel = require( '../../models/User' );
 module.exports = new LocalStrategy(
 	{ usernameField: 'email', session: false },
 	async function ( email, password, done ) {
-		const user = await UserModel.findOne( { email: email } );
+		try {
+			const user = await UserModel.findOne( { email: email } );
 
-		if ( !user ) {
-			done( null, false, 'Нет такого пользователя' );
-		}
+			if ( !user ) {
+				return done( null, false, 'Нет такого пользователя' );
+			}
 
-		const isValidPassword = await user.checkPassword( password );
+			const isValidPassword = await user.checkPassword( password );
 
-		if (isValidPassword){
-			done( null, user )
-		} else {
-			done( null, false, 'Неверный пароль' );
+			if ( isValidPassword ) {
+				return done( null, user );
+			} else {
+				return done( null, false, 'Неверный пароль' );
+			}
+		} catch ( error ) {
+			return done(error);
 		}
 	},
 );
