@@ -1,20 +1,25 @@
-const mongoose = require('mongoose');
-const connection = require('../libs/connection');
+const mongoose = require( 'mongoose' );
+const connection = require( '../libs/connection' );
 
-const subCategorySchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-});
+const schemaOptions = require('../schemaOptions');
 
-const categorySchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
+const subCategorySchema = new mongoose.Schema( {
+		title: {
+			type: String,
+			required: true,
+		},
+	},
+	{ ...schemaOptions }
+);
 
-  subcategories: [subCategorySchema],
-});
+const categorySchema = new mongoose.Schema( {
+		title: {
+			type: String,
+			required: true,
+		},
+		subcategories: [ subCategorySchema ],
+	},
+	{ ...schemaOptions }
+);
 
-module.exports = connection.model('Category', categorySchema);
+module.exports = connection.model( 'Category', categorySchema );
