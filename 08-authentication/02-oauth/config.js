@@ -11,24 +11,24 @@ module.exports = {
   },
   providers: {
     github: {
-      app_id: process.env.GITHUB_APP_ID || 'github_app_id',
-      app_secret: process.env.GITHUB_APP_SECRET || 'github_app_secret',
+      app_id: process.env.GITHUB_APP_ID || 'e356dc4add408d4fad82',
+      app_secret: process.env.GITHUB_APP_SECRET || 'fa30c486fd99439f08c3a7723fcea8882a5752dd',
       callback_uri: 'http://localhost:3000/oauth/github',
       options: {
         scope: ['user:email'],
       },
     },
     facebook: {
-      app_id: process.env.FACEBOOK_APP_ID || 'facebook_app_id',
-      app_secret: process.env.FACEBOOK_APP_SECRET || 'facebook_app_secret',
+      app_id: process.env.FACEBOOK_APP_ID || '2315885395223337',
+      app_secret: process.env.FACEBOOK_APP_SECRET || '39069a481ebaee0d7cf23b3009a04bfc',
       callback_uri: 'http://localhost:3000/oauth/facebook',
       options: {
         scope: ['email'],
       },
     },
     vkontakte: {
-      app_id: process.env.VKONTAKTE_APP_ID || 'vkontakte_app_id',
-      app_secret: process.env.VKONTAKTE_APP_SECRET || 'vkontakte_app_secret',
+      app_id: process.env.VKONTAKTE_APP_ID || 7671248,
+      app_secret: process.env.VKONTAKTE_APP_SECRET || 'KfblmcD9WKmIBDD6J9Pq',
       callback_uri: 'http://localhost:3000/oauth/vkontakte',
       options: {
         scope: ['email'],
