@@ -5,18 +5,20 @@ module.exports = async function authenticate ( strategy, email, displayName, don
 		return done( null, false, 'Не указан email' );
 	}
 
-	let user = await User.findOne( { email } );
+	try {
+		let user = await User.findOne( { email } );
 
-	if ( !user ) {
-		try {
+		if ( !user ) {
 			user = await User.create( {
 				email,
 				displayName
 			} );
-		} catch (err) {
-			return done(err);
-		}
-	}
 
-	done( null, user );
+		}
+
+		done( null, user );
+
+	} catch(err) {
+		return done(err);
+	}
 };
